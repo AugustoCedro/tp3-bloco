@@ -7,9 +7,11 @@ import org.example.exception.ClientNotFoundException;
 import org.example.model.Client;
 import org.example.service.ClientService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.time.Duration;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ClientControllerTest {
 
@@ -109,8 +111,6 @@ public class ClientControllerTest {
 
     }
 
-
-
     @Example
     void deleteExistingClient() {
         ClientService service = new ClientService();
@@ -127,6 +127,40 @@ public class ClientControllerTest {
         assertThrows(ClientNotFoundException.class,() -> {
             controller.deleteClientById(id);
         });
+    }
+
+    @Test
+    void simulateNetFailTest() {
+        ClientService service = new ClientService();
+
+        assertThrows(RuntimeException.class, () -> {
+            throw new RuntimeException("Falha na comunicação com API externa");
+        });
+    }
+    @Test
+    void networkTimeoutTest() {
+        ClientService service = new ClientService();
+
+        assertThrows(AssertionError.class, () ->
+                assertTimeout(Duration.ofMillis(200), service::simulateNetworkCall)
+        );
+    }
+    @Test
+    void rejectMaliciousEntryTest() {
+        ClientService service = new ClientService();
+        Client c = new Client("'; DROP TABLE clients; --", "ataque@hack.com");
+
+        assertThrows(IllegalArgumentException.class, () -> service.createClient(c));
+    }
+
+    @Test
+    void simulateOverloadTest() {
+        ClientService service = new ClientService();
+        for (int i = 0; i < 1000; i++) {
+            Client c = new Client("User" + i, "u" + i + "@email.com");
+            service.createClient(c);
+        }
+        assertEquals(1010, service.getClients().size());
     }
 
 

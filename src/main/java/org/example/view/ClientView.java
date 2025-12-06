@@ -83,7 +83,7 @@ public class ClientView {
                             <input type="email" class="form-control" id="email" name="email" value="%s" required>
                         </div>
                         <button type="submit" class="btn btn-success">Salvar</button>
-                        <a href="/items" class="btn btn-secondary">Cancelar</a>
+                        <a href="/clients" class="btn btn-secondary">Cancelar</a>
                     </form>
                 </body>
                 </html>

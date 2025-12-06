@@ -61,8 +61,27 @@ public class ClientService {
         throw new ClientNotFoundException("Cliente com ID: " + id + " não encontrado");
     }
 
-    private boolean isClientDataValid(Client client){
-        return client.getName() != "" && client.getEmail() != "" && client.getName() != null && client.getEmail() != null ;
+    private boolean isClientDataValid(Client client) {
+        if (client == null) return false;
+
+        if (client.getName() == null || client.getName().isBlank()) return false;
+        if (client.getEmail() == null || client.getEmail().isBlank()) return false;
+
+        String name = client.getName().toLowerCase();
+
+
+        if (name.contains("'") || name.contains(";") || name.contains("drop") || name.contains("--")) {
+            return false;
+        }
+
+        return true;
+    }
+    public void simulateNetworkCall() {
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Network interrupted");
+        }
     }
 
 

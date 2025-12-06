@@ -77,7 +77,7 @@ public class ClientViewTest {
         );
         deleteButton.click();
 
-        Assertions.assertFalse(driver.getPageSource().contains("Alice"));
+        Assertions.assertFalse(driver.getPageSource().contains("Alice")); 
     }
 }
 
