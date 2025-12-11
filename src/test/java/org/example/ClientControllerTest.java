@@ -94,6 +94,12 @@ public class ClientControllerTest {
             controller.createClient(client);
         });
     }
+    @Test
+    void invalidClientDataThrowsException() {
+        Client invalid = new Client("", "");
+        assertThrows(IllegalArgumentException.class, () -> service.createClient(invalid));
+    }
+
 
     @Example
     void updateClientWithValidData(@ForAll("validNames") String name,@ForAll("validEmails") String email,@ForAll("mockedClientIds") int id){
@@ -128,22 +134,16 @@ public class ClientControllerTest {
             controller.deleteClientById(id);
         });
     }
-
     @Test
-    void simulateNetFailTest() {
-        ClientService service = new ClientService();
-
+    void simulateNetworkFailureTest() {
         assertThrows(RuntimeException.class, () -> {
-            throw new RuntimeException("Falha na comunicação com API externa");
+            throw new RuntimeException("Network error");
         });
     }
     @Test
-    void networkTimeoutTest() {
+    void simulateTimeoutTest() {
         ClientService service = new ClientService();
-
-        assertThrows(AssertionError.class, () ->
-                assertTimeout(Duration.ofMillis(200), service::simulateNetworkCall)
-        );
+        assertTimeout(Duration.ofMillis(200), service::simulateNetworkCall);
     }
     @Test
     void rejectMaliciousEntryTest() {
