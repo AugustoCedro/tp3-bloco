@@ -27,10 +27,22 @@ public class ClientController {
 
                 ctx.redirect("/clients");
             } catch (IllegalArgumentException e) {
-                ctx.status(400).result("Erro ao criar cliente: " + e.getMessage());
-            } catch (Exception e) {
-                ctx.status(500).result("Erro inesperado no servidor");
+                Map<String, Object> model = new HashMap<>();
+                model.put("name", ctx.formParam("name"));
+                model.put("email", ctx.formParam("email"));
+
+
+                if (e.getMessage().toLowerCase().contains("nome")) {
+                    model.put("nameError", e.getMessage());
+                } else if (e.getMessage().toLowerCase().contains("email")) {
+                    model.put("emailError", e.getMessage());
+                } else {
+                    model.put("generalError", e.getMessage());
+                }
+
+                ctx.status(400).html(ClientView.renderForm(model));
             }
+
         });
         app.get("/clients/edit/{id}", ctx -> {
             try {
@@ -49,12 +61,33 @@ public class ClientController {
                 ctx.status(500).result("Erro interno inesperado");
             }
         });
-        app.post("/clients/edit/{id}",ctx -> {
-            int id =  ctx.pathParamAsClass("id",Integer.class).get();
-            String name = ctx.formParam("name");
-            String email = ctx.formParam("email");
-            service.updateClient(new Client(id,name,email));
-            ctx.redirect("/clients");
+        app.post("/clients/edit/{id}", ctx -> {
+            int id = ctx.pathParamAsClass("id", Integer.class).get();
+
+            try {
+                String name = ctx.formParam("name");
+                String email = ctx.formParam("email");
+
+                service.updateClient(new Client(id, name, email));
+                ctx.redirect("/clients");
+
+            } catch (IllegalArgumentException e) {
+
+                Map<String, Object> model = new HashMap<>();
+                model.put("id", id);
+                model.put("name", ctx.formParam("name"));
+                model.put("email", ctx.formParam("email"));
+
+                if (e.getMessage().toLowerCase().contains("nome")) {
+                    model.put("nameError", e.getMessage());
+                } else if (e.getMessage().toLowerCase().contains("email")) {
+                    model.put("emailError", e.getMessage());
+                } else {
+                    model.put("generalError", e.getMessage());
+                }
+
+                ctx.status(400).html(ClientView.renderForm(model));
+            }
         });
 
         app.post("/clients/delete/{id}",ctx -> {

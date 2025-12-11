@@ -39,13 +39,22 @@ public class ClientRepository {
        return null;
     }
 
+    public Client findClientByEmail(String email) {
+        for(Client client : repository){
+            if(Objects.equals(email, client.getEmail())){
+                return client;
+            }
+        }
+        return null;
+    }
+
     public void addClient(Client client) {
         repository.add(client);
     }
 
     public void updateClient(Client newClient) {
         for(Client client : repository){
-            if(client.getId() == newClient.getId()){
+            if(Objects.equals(client.getId(), newClient.getId())){
                 client.setEmail(newClient.getEmail());
                 client.setName(newClient.getName());
             }

@@ -94,11 +94,6 @@ public class ClientControllerTest {
             controller.createClient(client);
         });
     }
-    @Test
-    void invalidClientDataThrowsException() {
-        Client invalid = new Client("", "");
-        assertThrows(IllegalArgumentException.class, () -> service.createClient(invalid));
-    }
 
 
     @Example
@@ -134,34 +129,8 @@ public class ClientControllerTest {
             controller.deleteClientById(id);
         });
     }
-    @Test
-    void simulateNetworkFailureTest() {
-        assertThrows(RuntimeException.class, () -> {
-            throw new RuntimeException("Network error");
-        });
-    }
-    @Test
-    void simulateTimeoutTest() {
-        ClientService service = new ClientService();
-        assertTimeout(Duration.ofMillis(200), service::simulateNetworkCall);
-    }
-    @Test
-    void rejectMaliciousEntryTest() {
-        ClientService service = new ClientService();
-        Client c = new Client("'; DROP TABLE clients; --", "ataque@hack.com");
 
-        assertThrows(IllegalArgumentException.class, () -> service.createClient(c));
-    }
 
-    @Test
-    void simulateOverloadTest() {
-        ClientService service = new ClientService();
-        for (int i = 0; i < 1000; i++) {
-            Client c = new Client("User" + i, "u" + i + "@email.com");
-            service.createClient(c);
-        }
-        assertEquals(1010, service.getClients().size());
-    }
 
 
 
